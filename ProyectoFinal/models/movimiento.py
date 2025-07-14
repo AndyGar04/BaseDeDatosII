@@ -24,7 +24,6 @@ class Movimiento:
             print(" Error: Tipo de movimiento inválido.")
             return
 
-        # Actualizar stock del producto
         self.productos.update_one(
             {"_id": producto["_id"]},
             {"$set": {
@@ -50,4 +49,4 @@ class Movimiento:
         print(f" Reporte de movimientos del {fecha_inicio} al {fecha_fin}:")
 
         for m in resultados:
-            print(f"- ProductoID: {m['productoId']} | Tipo: {m['tipo']} | Cantidad: {m['cantidad']} | Motivo: {m['motivo']} | Fecha: {m['fecha']} | Usuario: {m['usuario']}")
+            print(f"- ProductoID: {m['productoId']} | Tipo: {m['tipo']} | Cantidad: {m['cantidad']} | Motivo: {m['motivo']} | Fecha: {m['fecha']}")

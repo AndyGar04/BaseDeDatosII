@@ -1,55 +1,77 @@
 from models.movimiento import Movimiento
 from db import productos, movimientos
-from bson import ObjectId
+from bson.objectid import ObjectId
 from datetime import datetime
 
 class MovimientoController:
+
     def __init__(self):
         self.modelo = Movimiento(movimientos, productos)
+        self.producto_db = productos
+
     def registrar_movimiento(self):
-        print("Registrar movimiento")
-        producto_id = input("ID del producto: ")
-        if not isinstance(producto_id, str) or producto_id=="" or producto_id.isspace():
-            raise ValueError("El producto debe ser un id valido")
-        tipo = input("Tipo (entrada/salida): ").strip()
-        if not isinstance(tipo, str) or tipo=="" or tipo.isspace():
-            raise ValueError("El tipo debe ser string valido")
-        cantidad = int(input("Cantidad: "))
-        if not isinstance(cantidad, int) or cantidad < 0:
-            raise ValueError("La cantidad debe ser un numero entero valido")
-        motivo = input("Motivo: ").strip()
-        if not isinstance(motivo, str) or motivo == "" or motivo.isspace():
-            raise ValueError("El motivo debe ser un string")
+        print("Registrar movimiento:")
+        try:
+            
+            producto_id_str = input("ID del producto: ").strip()
+            if not producto_id_str:
+                raise ValueError("El ID del producto no puede estar vacío.")
+            
+            try:
+                producto_object_id = ObjectId(producto_id_str)
+            except Exception:
+                raise ValueError(f"El ID '{producto_id_str}' no tiene un formato de ObjectId válido.")
+            
+            producto_existe = self.producto_db.find_one({"_id": producto_object_id})
+            if not producto_existe:
+                raise ValueError("No existe un producto con el ID proporcionado.")
 
-        movimiento = {
-            "productoId": producto_id,
-            "tipo": tipo,
-            "cantidad": cantidad,
-            "motivo": motivo,
-        }
+            tipo = input("Tipo (entrada/salida): ").strip().lower()
+            if tipo not in ["entrada", "salida"]:
+                raise ValueError("El tipo de movimiento debe ser 'entrada' o 'salida'.")
 
-        self.modelo.registrar(movimiento)
+            cantidad_str = input("Cantidad: ").strip()
+            if not cantidad_str.isdigit():
+                raise ValueError("La cantidad debe ser un número entero válido.")
+            cantidad = int(cantidad_str)
+            if cantidad <= 0:
+                raise ValueError("La cantidad debe ser un número entero positivo.")
+            
+            motivo = input("Motivo: ").strip()
+            if not motivo:
+                raise ValueError("El motivo no puede estar vacío.")
+
+            movimiento = {
+                "productoId": producto_object_id,
+                "tipo": tipo,
+                "cantidad": cantidad,
+                "motivo": motivo,
+                "fecha": datetime.now()
+            }
+
+            self.modelo.registrar(movimiento)
+            print("Movimiento creado!")
+
+        except ValueError as e:
+            print(f"Error de entrada de datos: {e}")
+        except Exception as e:
+            print(f"Ocurrió un error inesperado al registrar el movimiento: {e}")
 
     def generar_reporte(self):
-        print("Reporte de movimientos")
-        
-        fecha_inicio_str = input("Fecha inicio (YYYY-MM-DD): ").strip()
-        fecha_fin_str = input("Fecha fin (YYYY-MM-DD): ").strip()
-
+        print("\n--- Generar Reporte de Movimientos ---")
         try:
+            fecha_inicio_str = input("Fecha inicio (YYYY-MM-DD): ").strip()
+            fecha_fin_str = input("Fecha fin (YYYY-MM-DD): ").strip()
+
             fecha_inicio = datetime.strptime(fecha_inicio_str, "%Y-%m-%d")
             fecha_fin = datetime.strptime(fecha_fin_str, "%Y-%m-%d")
 
             if fecha_inicio > fecha_fin:
-                print("Error: La fecha de inicio no puede ser posterior a la fecha de fin.")
-                return 
+                raise ValueError("La fecha de inicio no puede ser posterior a la fecha de fin.")
+            
+            self.modelo.reporte(fecha_inicio, fecha_fin)
 
-            if self.modelo:
-                self.modelo.reporte(fecha_inicio, fecha_fin)
-            else:
-                print("Error: El modelo de reporte no está inicializado.")
-
-        except ValueError:
-            print("Error: Se ingresó una fecha con formato inválido. Por favor, use el formato YYYY-MM-DD.")
+        except ValueError as e:
+            print(f"Error de fecha: {e}. Por favor, use el formato YYYY-MM-DD y asegúrese que la fecha de inicio sea anterior o igual a la de fin.")
         except Exception as e:
-            print(f"Ocurrió un error inesperado: {e}")
+            print(f"Ocurrió un error inesperado al generar el reporte: {e}")

@@ -19,7 +19,7 @@ class Producto:
         else:
             print(" Producto no encontrado.")
             
-    def listar_stock_bajo(self):
+    def stock_bajo(self):
         bajos = self.productos.find({"$expr": {"$lt": ["$stockActual", "$stockMinimo"]}})
         print(" Productos con stock bajo:")
         for p in bajos:

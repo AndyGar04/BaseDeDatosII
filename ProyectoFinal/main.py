@@ -22,6 +22,8 @@ def menu():
         opcion = input("Selecciona opción: ")
 
         if opcion == "1":
+            print("Elija un proveedor disponible")
+            prc.listar_proveedores()
             pc.agregar_producto()
         elif opcion == "2":
             pc.consultar_stock()
