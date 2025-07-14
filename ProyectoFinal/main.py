@@ -32,7 +32,7 @@ def menu():
         elif opcion == "5":
             mc.generar_reporte()
         elif opcion == "6":
-            prc.registrar_proveedor()
+            prc.agregar_proveedor()
         elif opcion == "7":
             prc.listar_proveedores()
         elif opcion == "8":

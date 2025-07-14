@@ -32,10 +32,24 @@ class MovimientoController:
 
     def generar_reporte(self):
         print("Reporte de movimientos")
+        
         fecha_inicio_str = input("Fecha inicio (YYYY-MM-DD): ").strip()
         fecha_fin_str = input("Fecha fin (YYYY-MM-DD): ").strip()
 
-        fecha_inicio = datetime.strptime(fecha_inicio_str, "%Y-%m-%d")
-        fecha_fin = datetime.strptime(fecha_fin_str, "%Y-%m-%d")
+        try:
+            fecha_inicio = datetime.strptime(fecha_inicio_str, "%Y-%m-%d")
+            fecha_fin = datetime.strptime(fecha_fin_str, "%Y-%m-%d")
 
-        self.modelo.reporte(fecha_inicio, fecha_fin)
+            if fecha_inicio > fecha_fin:
+                print("Error: La fecha de inicio no puede ser posterior a la fecha de fin.")
+                return 
+
+            if self.modelo:
+                self.modelo.reporte(fecha_inicio, fecha_fin)
+            else:
+                print("Error: El modelo de reporte no está inicializado.")
+
+        except ValueError:
+            print("Error: Se ingresó una fecha con formato inválido. Por favor, use el formato YYYY-MM-DD.")
+        except Exception as e:
+            print(f"Ocurrió un error inesperado: {e}")
