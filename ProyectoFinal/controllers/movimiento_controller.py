@@ -8,8 +8,8 @@ class MovimientoController:
         self.modelo = Movimiento(movimientos, productos)
     def registrar_movimiento(self):
         print("Registrar movimiento")
-        producto_id = int(input("ID del producto: "))
-        if not isinstance(producto_id, int) or producto_id < 0:
+        producto_id = input("ID del producto: ")
+        if not isinstance(producto_id, str) or producto_id=="" or producto_id.isspace():
             raise ValueError("El producto debe ser un id valido")
         tipo = input("Tipo (entrada/salida): ").strip()
         if not isinstance(tipo, str) or tipo=="" or tipo.isspace():
